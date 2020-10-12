@@ -21,3 +21,7 @@ code {
   grid-template-rows: 48px auto 24px;
   background-color: #333333;
 }
+
+.MuiButton-root {
+  text-transform: capitalize!important;
+}

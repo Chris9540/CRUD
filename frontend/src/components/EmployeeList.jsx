@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {
-    Button, createMuiTheme,
+    Button,
     Paper,
     Table,
     TableBody,
@@ -8,17 +8,14 @@ import {
     TableContainer,
     TableHead,
     TableRow,
-    Typography, withStyles
+    withStyles
 } from "@material-ui/core";
-import red from "@material-ui/core/colors/red";
-import {makeStyles, ThemeProvider} from "@material-ui/styles";
+import {makeStyles} from "@material-ui/styles";
 import TablePagination from "@material-ui/core/TablePagination";
 import {apiServices} from "../service/services";
+import ColorButton from "./ColorButton";
+import {red} from "@material-ui/core/colors";
 
-const redButton = createMuiTheme({
-    palette : {primary : red, type: "dark",},
-    shape : {borderRadius : 0},
-})
 const height = 300;
 const useStyles = makeStyles((theme) => ({
     container : {
@@ -28,6 +25,9 @@ const useStyles = makeStyles((theme) => ({
     },
     pagination : {
         backgroundColor : '#212121',
+    },
+    button: {
+        margin: theme.spacing(),
     }
 }))
 
@@ -45,7 +45,7 @@ const StyledTableRow = withStyles((theme) => ({
     },
 }))(TableRow);
 
-export default function EmployeeList() {
+export default function EmployeeList(props) {
     const [rows, setRows] = useState([]);
     const [page, setPage] = useState(0);
     const [size, setSize] = useState(5);
@@ -61,14 +61,27 @@ export default function EmployeeList() {
     const changeSize = (e) => {
         setSize(parseInt(e.target.value));
         setPage(0);
-        console.log("size", parseInt(e.target.value))
         getData(0,  parseInt(e.target.value));
     }
+
 
     const getData = (p, s) => {
         apiServices.employee.list(p, s).then(res=>{
             setRows(res.data);
         });
+    }
+
+    const deleteEmployee = (id) => {
+        apiServices.employee.delete(id)
+            .then(res=>{
+                if (res.data.deleted) {
+                    apiServices.employee.count().then(res=>{
+                        setCount(res.data);
+                        setPage(0);
+                        getData(0, size)
+                    })
+                }
+            })
     }
 
     useEffect(()=>{
@@ -81,18 +94,29 @@ export default function EmployeeList() {
     }, [])
     return (
         <Paper>
+            <Button
+                variant={"contained"}
+                color={"primary"}
+                className={classes.button}
+                onClick={()=>props.setView("add")}
+            >
+                Add Employee
+            </Button>
             <TableContainer component={"div"} className={classes.container}>
                 <Table size={"small"} stickyHeader>
                     <TableHead className={classes.header}>
                         <TableRow>
-                            <HeadCell component={"th"} align={"center"}>
+                            <HeadCell component={"th"}>
                                 Id
                             </HeadCell>
-                            <HeadCell component={"th"} align={"center"}>
+                            <HeadCell component={"th"}>
                                 First Name
                             </HeadCell>
-                            <HeadCell component={"th"} align={"center"}>
+                            <HeadCell component={"th"}>
                                 Last Name
+                            </HeadCell>
+                            <HeadCell component={"th"}>
+                                Email
                             </HeadCell>
                             <HeadCell component={"th"} align={"right"}>
                                 Actions
@@ -103,14 +127,17 @@ export default function EmployeeList() {
                         {
                             rows.map((row, key)=> (
                                 <StyledTableRow key={key}>
-                                    <TableCell align={"center"} component={"th"} scope={"row"}>
+                                    <TableCell component={"th"} scope={"row"}>
                                         {row.id}
                                     </TableCell>
-                                    <TableCell align={"center"}>
+                                    <TableCell>
                                         {row.firstName}
                                     </TableCell>
-                                    <TableCell align={"center"}>
+                                    <TableCell >
                                         {row.lastName}
+                                    </TableCell>
+                                    <TableCell >
+                                        {row.emailId}
                                     </TableCell>
                                     <TableCell align={"right"}>
                                         <Button
@@ -118,18 +145,22 @@ export default function EmployeeList() {
                                             size={"small"}
                                             style={{marginRight : '20px'}}
                                             color={"secondary"}
+                                            onClick={()=>props.setView("update", row.id)}
                                         >
                                             Edit
                                         </Button>
-                                        <ThemeProvider theme={redButton}>
-                                            <Button
-                                                color={"primary"}
-                                                size={"small"}
-                                                variant={"contained"}
-                                            >
-                                                Delete
-                                            </Button>
-                                        </ThemeProvider>
+                                        <ColorButton
+                                            color={red}
+                                            buttonProps={{
+                                                variant : 'contained',
+                                                color : 'primary',
+                                                size: 'small',
+                                                onClick : ()=>{deleteEmployee(row.id)},
+
+                                            }}
+                                        >
+                                            Delete
+                                        </ColorButton>
                                     </TableCell>
                                 </StyledTableRow>
                             ))

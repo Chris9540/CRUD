@@ -2,7 +2,7 @@
   "palette": {
     "common": {
       "black": "#000",
-      "white": "#dfdfdf"
+      "white": "#fff"
     },
     "type": "dark",
     "primary": {
@@ -40,7 +40,7 @@
       "A700": "#616161"
     },
     "text": {
-      "primary": "#dfdfdf",
+      "primary": "#fff",
       "secondary": "rgba(255, 255, 255, 0.7)",
       "disabled": "rgba(255, 255, 255, 0.5)",
       "hint": "rgba(255, 255, 255, 0.5)",

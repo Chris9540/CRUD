@@ -6,7 +6,6 @@ import * as serviceWorker from './serviceWorker';
 import 'fontsource-roboto';
 import {createMuiTheme, ThemeProvider} from '@material-ui/core/styles';
 import rawTheme from './theme.json'
-
 const theme = createMuiTheme(rawTheme)
 
 ReactDOM.render(
